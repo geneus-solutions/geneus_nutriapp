@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "Nutri-App",
+    "slug": "Nutri-App",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/Company-icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/Company-splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/Company-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
+  }
+}
