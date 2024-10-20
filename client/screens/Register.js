@@ -18,13 +18,13 @@ try{
 if(response.status === 201){
   dispatch(setUser(response.data))
   Toast.show({
-    type: 'success',
+    type: 'success',                                                        
     text1: 'Success',
     text2: 'Registered successfully',
     visibilityTime: 3000,
     autoHide: true,
     
-  });
+  });                                  
 
  console.log(response.data.accessToken);
  console.log(response.data.refreshToken);
