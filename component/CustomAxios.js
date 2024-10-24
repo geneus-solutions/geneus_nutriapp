@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const customAxios = axios.create({
-    baseURL: 'http://192.168.0.105:8000', 
+    baseURL: 'https://geneus-api.onrender.com', 
     headers: {
       'Content-Type': 'application/json', 
     },
