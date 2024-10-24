@@ -15,7 +15,7 @@ console.log(servingSize)
   const [editedQuantity, setEditedQuantity] = useState(quantity.toString());
 const handelremove = async() =>{
 try{
-  const res = await api.delete('/api/food', { data: { meal: editedMealType, id } });
+  const res = await api.delete('/api/removeFood', { data: { meal: editedMealType, id } });
 
 if(res.status === 200){
   console.log("Deleted meal", res.data.message)
@@ -39,7 +39,7 @@ if(res.status === 200){
   const handleSave = async() => {   
  
 try{
-const res = await api.put('/api/food', { meal : editedMealType, quantity : editedQuantity, id : id });
+const res = await api.put('/api/updateFood', { meal : editedMealType, quantity : editedQuantity, id : id });
 if(res.status === 200){
   console.log("Updated meal", res.data.message);
   navigation.goBack();

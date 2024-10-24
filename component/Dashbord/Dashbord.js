@@ -32,7 +32,8 @@ const Dashboard = ({ navigation }) => {
       navigation.navigate('Login');
     }
     try {
-      const response = await customAxios.get(`/api/food/${user._id}`);
+      const response = await customAxios.get(`/api/getFoodById/${user._id}`);
+
 
       if (response.status === 200) {
         console.log("Food data", response.data);

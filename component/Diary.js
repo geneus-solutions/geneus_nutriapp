@@ -56,7 +56,7 @@ const Diary = ({navigation}) => {
 
   const getDiary = async () => {
     try {
-      const response = await customAxios.get(`/api/food/${user._id}`);
+      const response = await customAxios.get(`/api/getFoodById/${user._id}`);
       setDiary(response.data);
     } catch (error) {
       console.error(error);

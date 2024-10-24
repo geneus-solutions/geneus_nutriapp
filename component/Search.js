@@ -30,7 +30,7 @@ const Search = () => {
   const getData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const res = await customAxios.get('/api/item');
+      const res = await customAxios.get('/getFoodItems');
       setItems(res.data);
       setFilteredItems(res.data);
       console.log('Fetched items:', res.data);
@@ -68,7 +68,7 @@ const Search = () => {
     };
   
     try {
-      const response = await customAxios.post('/api/food', mealData);
+      const response = await customAxios.post('/api/addFood', mealData);
       console.log('Response from server:', response.data);
       Toast.show({
         type: 'success',

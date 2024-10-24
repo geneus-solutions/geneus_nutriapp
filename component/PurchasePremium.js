@@ -16,7 +16,7 @@ const navigation = useNavigation();
     setLoading(true);
     try {
      
-      const res = await api.post('/api/plan/create-order', { amount: 9 });
+      const res = await api.post('/api/plan/create-order', { amount: 1000 });
 
       if (res.status === 200) {
         const { amount, orderId, currency } = res.data;

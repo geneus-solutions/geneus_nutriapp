@@ -78,12 +78,39 @@ const Edit = ({ navigation }) => {
   
     const validateFields = () => {
       const { goal, activityLevel, gender, country, height, weight } = profile;
-      if (!goal || !activityLevel || !gender || !country || !height || !weight) {
-        Alert.alert("Error", "All fields are required!");
+      
+      if (!goal) {
+        Alert.alert("Error", "Goal is required!");
         return false;
       }
+      
+      if (!activityLevel) {
+        Alert.alert("Error", "Activity Level is required!");
+        return false;
+      }
+      
+      if (!gender) {
+        Alert.alert("Error", "Gender is required!");
+        return false;
+      }
+      
+      if (!country) {
+        Alert.alert("Error", "Country is required!");
+        return false;
+      }
+      
+      if (!height) {
+        Alert.alert("Error", "Height is required!");
+        return false;
+      }
+      
+      if (!weight) {
+        Alert.alert("Error", "Weight is required!");
+        return false;
+      }
+    
       return true;
-    };
+    }
   
     const handleSubmit = async () => {
       if (!validateFields()) return;

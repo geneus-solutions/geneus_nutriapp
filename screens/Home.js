@@ -1,8 +1,6 @@
-import { StyleSheet, Text, View } from 'react-native'; 
+import { StyleSheet, Text, View, ActivityIndicator } from 'react-native'; 
 import React, { useEffect, useState } from 'react';
-import * as Updates from 'expo-updates';
 import * as SecureStore from 'expo-secure-store';
-import customAxios from '../component/CustomAxios';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import Dashboard from '../component/Dashbord/Dashbord';
@@ -14,25 +12,35 @@ import { Ionicons } from 'react-native-vector-icons';
 import Search from '../component/Search';
 import Edit from '../component/Edit';
 import api from '../component/PrivateAxios';
-import {setNutrition} from '../redux/NutritionSlice'
+import { setNutrition } from '../redux/NutritionSlice';
 import DiaryDetail from '../component/DiaryDetail';
+
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const DashboardStack = () => (
   <Stack.Navigator>
     <Stack.Screen name="DashboardMain" component={Dashboard} options={{ headerShown: false }} />
-    <Stack.Screen options={{ headerShown: false }} name="DashboardSearch" component={Search} />
-    <Stack.Screen options={{ headerShown: false }} name="DashboardEdit" component={Edit} />
+    <Stack.Screen name="DashboardSearch" component={Search} options={{ headerShown: false }} />
+    <Stack.Screen name="DashboardEdit" component={Edit} options={{ headerShown: false }} />
   </Stack.Navigator>
 );
+
 const DiaryStack = () => (
   <Stack.Navigator>
     <Stack.Screen name="DiaryMain" component={Diary} options={{ headerShown: false }} />
-    <Stack.Screen options={{ headerShown: false }} name="DiarySearch" component={Search} />
-    <Stack.Screen  name="DiaryDetail" component={DiaryDetail} />
+    <Stack.Screen name="DiarySearch" component={Search} options={{ headerShown: false }} />
+    <Stack.Screen name="DiaryDetail" component={DiaryDetail} />
   </Stack.Navigator>
 );
+
+const LoadingScreen = () => (
+  <View style={styles.loadingContainer}>
+    <ActivityIndicator size="large" color="#2196F3" />
+    <Text style={styles.loadingText}>Loading...</Text>
+  </View>
+);
+
 const Home = ({ navigation }) => {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user.user);
@@ -40,75 +48,80 @@ const Home = ({ navigation }) => {
   const [isPremium, setIsPremium] = useState(null);
 
   useEffect(() => {
-    getUser();
-}, [isLoading]);
+    checkUserStatus();
+  }, []);
+
   useEffect(() => {
     if (!isLoading && !user) {
-      navigation.navigate('Login');
+      navigation.replace('Login');
     }
-  }, [user, isLoading, navigation]);
+  }, [user, isLoading]);
 
-  const getUser = async () => {
+  const checkPlanStatus = (plan) => {
+    if (!plan) return false;
+
+    const planName = plan.name?.toLowerCase().trim();
+    const expirationDate = plan.endDate ? new Date(plan.endDate) : null;
+    const isExpired = expirationDate && new Date() > expirationDate;
+
+    console.log('Plan check:', {
+      planName,
+      expirationDate,
+      isExpired,
+    });
+
+    return !isExpired && (planName === 'free trial' || planName === 'premium plan');
+  };
+
+  const checkUserStatus = async () => {
     try {
       const token = await SecureStore.getItemAsync('accessToken');
       if (!token) {
+        console.log('No token found');
+        setIsPremium(false);
         setIsLoading(false);
-        setIsPremium(false); 
         return;
       }
-  
+
       const response = await api.get('/api/user');
-      
-    
-      if (response.data === null) {
-        navigation.navigate('Login');
-      } else {
-      
-        console.log("User data:", response.data);
-        dispatch(setUser(response.data));
-        dispatch(setNutrition(response.data.macronutrients));
-        
-        const userPlan = response.data.user?.plan;
-        
-        if (userPlan) {
-          console.log("User plan:", userPlan);
-          const expirationDate = userPlan.endDate ? new Date(userPlan.endDate) : null;
-          
-          const isDateExpired = expirationDate && new Date() > expirationDate;
-          console.log("Is date expired:", isDateExpired);
-  
-          if (!isDateExpired) {
-            const planName = userPlan.name?.toLowerCase().trim();
-            if (planName === 'free trial' || planName === 'premium plan') {
-              setIsPremium(true);
-            } else {
-              setIsPremium(false);
-            }
-          } else {
-            setIsPremium(false);
-          }
-        } else {
-          setIsPremium(false);
-        }
+      console.log('User data response:', response.data);
+
+      if (!response.data) {
+        navigation.replace('Login');
+        return;
       }
+
+      dispatch(setUser(response.data));
+      
+      if (response.data.macronutrients) {
+        dispatch(setNutrition(response.data.macronutrients));
+      }
+
+     
+      const userPlan = response.data.plan || response.data.user?.plan;
+      const hasPremium = checkPlanStatus(userPlan);
+      
+      console.log('Premium status:', hasPremium);
+      setIsPremium(hasPremium);
+
     } catch (error) {
-      console.log("Error fetching user data:", error);
+      console.error('Error checking user status:', error);
       setIsPremium(false);
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   if (isLoading) {
-    return <Text>Loading...</Text>;
+    return <LoadingScreen />;
+  }
+
+  if (!user) {
+    return null; 
   }
 
   if (isPremium === false) {
-    return <PurchasePremium />;
-  }
-  
-  if (isPremium === null) {
-    return <Text>Checking premium status...</Text>;
+    return <PurchasePremium onPurchaseComplete={checkUserStatus} />;
   }
 
   return (
@@ -126,21 +139,30 @@ const Home = ({ navigation }) => {
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: '#2f95dc',
+        tabBarActiveTintColor: '#2196F3',
         tabBarInactiveTintColor: 'gray',
         tabBarLabelStyle: styles.tabLabel,
       })}
     >
-      <Tab.Screen name="Dashboard" options={{ headerShown: false }} component={DashboardStack} />
-      <Tab.Screen name="Diary" options={{ headerShown: false }} component={DiaryStack} />
-      <Tab.Screen name="Plan" options={{ headerShown: false }} component={PurchasePremium} />
+      <Tab.Screen name="Dashboard" component={DashboardStack} options={{ headerShown: false }} />
+      <Tab.Screen name="Diary" component={DiaryStack} options={{ headerShown: false }} />
+      <Tab.Screen name="Plan" component={PurchasePremium} options={{ headerShown: false }} />
     </Tab.Navigator>
   );
 };
 
-export default Home;
-
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#666',
+  },
   tabBar: {
     backgroundColor: '#f8f9fa',
     borderTopWidth: 1,
@@ -153,3 +175,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
+
+export default Home;
