@@ -3,7 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import { useNavigation } from '@react-navigation/native';
 
 const api = axios.create({
-  baseURL: 'https://geneus-api.onrender.com ',
+  baseURL: 'https://geneus-api.onrender.com',
 });
 
 
@@ -41,7 +41,7 @@ api.interceptors.response.use((response) => {
       const refreshToken = await SecureStore.getItem('refreshToken');
       console.log("Refresh Token:", refreshToken); 
       
-      const response = await axios.post('https://geneus-api.onrender.com /api/user/refreshToken', { refreshToken });
+      const response = await axios.post('https://geneus-api.onrender.com/api/user/refresh', { refreshToken });
       const newAccessToken = response.data.accessToken;
       console.log("New Access Token:", newAccessToken);
       

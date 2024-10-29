@@ -60,11 +60,12 @@ const Register = ({ navigation }) => {
     }
 
     try {
-      const response = await customAxios.post('/api/user/register', {
+      console.log('Registering user...');
+      const response = await customAxios.post('/api/user/signup', {
         name: username,
         email,
         password,
-        mobile: number,
+        mobile: number
       });
 
       if (response.status === 200) {
@@ -80,6 +81,9 @@ const Register = ({ navigation }) => {
         await SecureStore.setItemAsync('accessToken', response.data.accessToken);
         await SecureStore.setItemAsync('refreshToken', response.data.refreshToken);
         navigation.navigate('UserData');
+      }
+      else{
+        console.log(response.data);
       }
     } catch (error) {
       Toast.show({
