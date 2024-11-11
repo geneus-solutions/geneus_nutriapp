@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, Dimensions, Animated } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions, Animated, Image } from 'react-native';
 import React, { useState, useCallback } from 'react';
 import { Ionicons } from 'react-native-vector-icons';
 import CalorieDiagram from '../CalorieDiagram';
@@ -8,7 +8,7 @@ import customAxios from '../CustomAxios';
 import { useSelector } from 'react-redux';
 import { useFocusEffect } from '@react-navigation/native';
 import { ScrollView } from 'react-native-gesture-handler';
-
+import {LinearGradient} from "expo-linear-gradient"
 const { width: screenWidth } = Dimensions.get('window');
 
 const Dashboard = ({ navigation }) => {
@@ -75,10 +75,19 @@ const Dashboard = ({ navigation }) => {
   return (
     <View style={{ flex: 1, marginTop: 30, margin: 20 }}>
       <ScrollView showsVerticalScrollIndicator={false}>
+        <View style = {{flexDirection : 'row', justifyContent: 'space-between'}}>
         <View>
           <Text style={{ fontSize: 35, fontWeight: 'bold' }}>Hello {user.name}</Text>
         </View>
+        <View style={{ borderRadius: 25, overflow: 'hidden' }}>
+  <Image 
+    source={require('../../assets/Company-icon.png')}
+    style={{ width: 50, height: 50, alignSelf: 'center', borderRadius: 25 }}
+  />
+</View>
 
+        </View>
+       
         <View>
           <TouchableOpacity onPress={() => navigation.navigate('DashboardSearch')}>
             <View style={styles.searchBar}>

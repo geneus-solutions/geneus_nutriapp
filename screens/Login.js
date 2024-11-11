@@ -47,7 +47,7 @@ const Login = ({ navigation }) => {
     }
 
     try {
-      const response = await customAxios.post('/api/user/login', {
+      const response = await customAxios.post('/login', {
         email,
         password,
       });
