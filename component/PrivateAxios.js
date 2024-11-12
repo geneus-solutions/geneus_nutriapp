@@ -6,11 +6,16 @@ const api = axios.create({
   baseURL: 'https://geneus-api.onrender.com',
 });
 
+let navigator; // Variable to store the navigation object
+
+export const setNavigator = (nav) => {
+  navigator = nav;
+};
 
 api.interceptors.request.use(async (config) => {
   console.log("Intercepting request:", config.url); 
   try {
-    const token = await SecureStore.getItem('accessToken');
+    const token = await SecureStore.getItemAsync('accessToken');
     console.log("Access Token:", token); 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -24,12 +29,11 @@ api.interceptors.request.use(async (config) => {
   return Promise.reject(error);
 });
 
-
 api.interceptors.response.use((response) => {
   console.log("Response received:", response.data); 
   return response;
 }, async (error) => {
-  console.error("Response error from private axios :", error.response.status, error.message); 
+  console.error("Response error from private axios:", error.response.status, error.message); 
   
   const originalRequest = error.config;
   
@@ -38,14 +42,14 @@ api.interceptors.response.use((response) => {
     originalRequest._retry = true;
 
     try {
-      const refreshToken = await SecureStore.getItem('refreshToken');
+      const refreshToken = await SecureStore.getItemAsync('refreshToken');
       console.log("Refresh Token:", refreshToken); 
       
       const response = await axios.post('https://geneus-api.onrender.com/api/user/refresh', { refreshToken });
       const newAccessToken = response.data.accessToken;
       console.log("New Access Token:", newAccessToken);
       
-      await SecureStore.setItem('accessToken', newAccessToken);
+      await SecureStore.setItemAsync('accessToken', newAccessToken);
       
       originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
       return api(originalRequest); 
@@ -55,7 +59,11 @@ api.interceptors.response.use((response) => {
       await SecureStore.deleteItemAsync('accessToken');
       await SecureStore.deleteItemAsync('refreshToken');
       console.log("Tokens cleared after failed refresh.");
+      
     
+      if (navigator) {
+        navigator.navigate('Login');
+      }
     }
   }
   
