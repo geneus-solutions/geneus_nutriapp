@@ -1,29 +1,38 @@
 {
-    "expo": {
-        "name": "Nutri-App",
-        "slug": "Nutri-App",
-        "version": "1.0.0",
-        "orientation": "portrait",
-        "icon": "./assets/Company-icon.png",
-        "userInterfaceStyle": "light",
-        "newArchEnabled": true,
-        "splash": {
-            "image": "./assets/Company-splash.png",
-            "resizeMode": "cover",
-            "backgroundColor": "#ffffff"
-        },
-        "ios": {
-            "supportsTablet": true
-        },
-        "android": {
-            "adaptiveIcon": {
-                "foregroundImage": "./assets/Company-icon.png",
-                "backgroundColor": "#ffffff"
-            }
-        },
-        "web": {
-            "favicon": "./assets/favicon.png"
-        },
-        "plugins": ["expo-secure-store"]
-    }
+  "expo": {
+    "name": "Nutri-App",
+    "slug": "Nutri-App",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/Company-icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/Company-splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/Company-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.geneussolutions.NutriApp"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e602b1da-e621-45c3-83e9-c295bc88d602"
+      }
+    },
+    "owner": "geneus-solutions"
+  }
 }
