@@ -68,7 +68,7 @@ const Register = ({ navigation }) => {
 
         try {
             console.log("Registering user...");
-            const response = await customAxios.post("/signup", {
+            const response = await customAxios.post("/androidSignup", {
                 name: username,
                 email,
                 password,
