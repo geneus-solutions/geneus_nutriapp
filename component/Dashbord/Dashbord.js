@@ -7,7 +7,7 @@ import {
     Animated,
     Image,
 } from "react-native";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, use } from "react";
 import { Ionicons } from "react-native-vector-icons";
 import CalorieDiagram from "../CalorieDiagram";
 import * as Updates from "expo-updates";
@@ -23,6 +23,7 @@ const Dashboard = ({ navigation }) => {
     const [totalCalories, setTotalCalories] = useState(0);
     const user = useSelector((state) => state.user.user.user);
     const nutritionsData = useSelector((state) => state.nutrition.nutrition);
+    const [isExpired, setIsExpired] = useState(false);
     console.log("data from dashboard ", nutritionsData);
 
     const [remainingCalories, setRemainingCalories] = useState(0);
@@ -91,6 +92,15 @@ const Dashboard = ({ navigation }) => {
             getFood();
         }, [getFood])
     );
+    useFocusEffect(
+        useCallback(() => {
+            if (user && user.plan?.endDate) {
+                const expirationDate = new Date(user.plan.endDate);
+                const expired = expirationDate < new Date();
+                setIsExpired(expired);
+            }
+        }, [user])
+    );
 
     const handleReload = async () => {
         try {
@@ -148,84 +158,88 @@ const Dashboard = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
 
-                <View style={styles.carouselContainer}>
-                    <Animated.ScrollView
-                        horizontal
-                        pagingEnabled
-                        showsHorizontalScrollIndicator={false}
-                        onScroll={Animated.event(
-                            [
-                                {
-                                    nativeEvent: {
-                                        contentOffset: { x: scrollX },
+                {isExpired ? (
+                    <></>
+                ) : (
+                    <View style={styles.carouselContainer}>
+                        <Animated.ScrollView
+                            horizontal
+                            pagingEnabled
+                            showsHorizontalScrollIndicator={false}
+                            onScroll={Animated.event(
+                                [
+                                    {
+                                        nativeEvent: {
+                                            contentOffset: { x: scrollX },
+                                        },
                                     },
-                                },
-                            ],
-                            { useNativeDriver: false }
-                        )}
-                        scrollEventThrottle={16}
-                        onMomentumScrollEnd={(event) => {
-                            const slideIndex = Math.round(
-                                event.nativeEvent.contentOffset.x /
-                                    (screenWidth - 40)
-                            );
-                            setActiveSlide(slideIndex);
-                        }}
-                    >
-                        {nutritionData.map((item, index) => {
-                            const inputRange = [
-                                (index - 1) * (screenWidth - 40),
-                                index * (screenWidth - 40),
-                                (index + 1) * (screenWidth - 40),
-                            ];
+                                ],
+                                { useNativeDriver: false }
+                            )}
+                            scrollEventThrottle={16}
+                            onMomentumScrollEnd={(event) => {
+                                const slideIndex = Math.round(
+                                    event.nativeEvent.contentOffset.x /
+                                        (screenWidth - 40)
+                                );
+                                setActiveSlide(slideIndex);
+                            }}
+                        >
+                            {nutritionData.map((item, index) => {
+                                const inputRange = [
+                                    (index - 1) * (screenWidth - 40),
+                                    index * (screenWidth - 40),
+                                    (index + 1) * (screenWidth - 40),
+                                ];
 
-                            const scale = scrollX.interpolate({
-                                inputRange,
-                                outputRange: [0.8, 1, 0.8],
-                                extrapolate: "clamp",
-                            });
+                                const scale = scrollX.interpolate({
+                                    inputRange,
+                                    outputRange: [0.8, 1, 0.8],
+                                    extrapolate: "clamp",
+                                });
 
-                            return (
-                                <Animated.View
-                                    key={index}
-                                    style={[
-                                        styles.slide,
-                                        { transform: [{ scale }] },
-                                    ]}
-                                >
-                                    <View
+                                return (
+                                    <Animated.View
+                                        key={index}
                                         style={[
-                                            styles.infoBox,
-                                            { width: screenWidth - 60 },
+                                            styles.slide,
+                                            { transform: [{ scale }] },
                                         ]}
                                     >
-                                        <Text style={styles.headerText}>
-                                            {item.title}
-                                        </Text>
-                                        <CalorieDiagram
-                                            goal={item.goal}
-                                            current={item.current}
-                                            remaining={item.remaining}
-                                        />
-                                    </View>
-                                </Animated.View>
-                            );
-                        })}
-                    </Animated.ScrollView>
-                    <View style={styles.pagination}>
-                        {nutritionData.map((_, index) => (
-                            <View
-                                key={index}
-                                style={[
-                                    styles.paginationDot,
-                                    index === activeSlide
-                                        ? styles.paginationDotActive
-                                        : null,
-                                ]}
-                            />
-                        ))}
+                                        <View
+                                            style={[
+                                                styles.infoBox,
+                                                { width: screenWidth - 60 },
+                                            ]}
+                                        >
+                                            <Text style={styles.headerText}>
+                                                {item.title}
+                                            </Text>
+                                            <CalorieDiagram
+                                                goal={item.goal}
+                                                current={item.current}
+                                                remaining={item.remaining}
+                                            />
+                                        </View>
+                                    </Animated.View>
+                                );
+                            })}
+                        </Animated.ScrollView>
+                        <View style={styles.pagination}>
+                            {nutritionData.map((_, index) => (
+                                <View
+                                    key={index}
+                                    style={[
+                                        styles.paginationDot,
+                                        index === activeSlide
+                                            ? styles.paginationDotActive
+                                            : null,
+                                    ]}
+                                />
+                            ))}
+                        </View>
                     </View>
-                </View>
+                )}
 
                 <View>
                     <View style={styles.infoBoxRow}>
